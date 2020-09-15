@@ -4,6 +4,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/rs/xid"
 	"golang.org/x/net/context"
 )
 
@@ -114,11 +115,14 @@ func (this *CronServer) start() {
 // func (this *CronServer) Start() {
 // 	go this.start()
 // }
+//从取消某个任务的定时执行
 func (this *CronServer) CronOut(tid string) {
 	this.lock.Lock()
 	delete(this.CronMap, tid)
 	this.lock.Unlock()
 }
+
+//从现在开始定时执行某个任务
 func (this *CronServer) CronIn(howOftenKeepFresh time.Duration, callBack *CallbackInfoStruct) {
 	now := time.Now()
 	a := now.Add(howOftenKeepFresh)
@@ -131,4 +135,20 @@ func (this *CronServer) CronIn(howOftenKeepFresh time.Duration, callBack *Callba
 	this.CronMap[callBack.TaskId] = info
 	this.lock.Unlock()
 	this.CronInChannel <- callBack.TaskId
+}
+
+//过一阵子再开始定时执行某个任务
+func (this *CronServer) CronInAfterWait(howOftenKeepFresh time.Duration, afterWait time.Duration, callBack *CallbackInfoStruct) {
+	taskTemp := xid.New().String()
+	outAfterWait := func(ctx context.Context, tid string) error {
+		this.CronOut(tid)
+		this.CronIn(howOftenKeepFresh, callBack)
+		return nil
+	}
+	this.CronIn(afterWait, &CallbackInfoStruct{
+		CallbackFunc: outAfterWait,
+		Context:      context.Background(),
+		TaskId:       taskTemp,
+	})
+
 }

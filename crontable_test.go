@@ -10,6 +10,10 @@ import (
 
 func TestCron(t *testing.T) {
 	cronTable := NewCron()
+	cronTable.CronInAfterWait(time.Second*1, time.Second*7, &CallbackInfoStruct{
+		CallbackFunc: testCallBack,
+		TaskId:       "4",
+	})
 	cronTable.CronIn(time.Second*1, &CallbackInfoStruct{
 		CallbackFunc: testCallBack,
 		TaskId:       "1",
