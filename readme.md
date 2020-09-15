@@ -9,19 +9,19 @@ This is a simple library to handle scheduled tasks. Tasks can be run in a minimu
     cronTable := NewCron()
 ```
 
-### put in a task
+### put in a task and start now
 ```golang
 	cronTable.CronIn(time.Second*1, &CallbackInfoStruct{
 		CallbackFunc: testCallBack,
 		TaskId:       "taskId",
 	})
 ```
-### take out a task
+### stop a task 
 ```golang
 	cronTable.CronOut("taskId")
 ```
 
-### take out a task
+###  put in a task and start after wait
 ```golang
 	cronTable.CronInAfterWait(time.Second*1, time.Second*7, &CallbackInfoStruct{
 		CallbackFunc: testCallBack,
