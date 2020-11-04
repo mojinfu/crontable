@@ -142,6 +142,7 @@ func (this *CronServer) CronInAfterWait(howOftenKeepFresh time.Duration, afterWa
 	taskTemp := xid.New().String()
 	outAfterWait := func(ctx context.Context, tid string) error {
 		this.CronOut(tid)
+		go callBack.CallbackFunc(callBack.Context, callBack.TaskId)
 		this.CronIn(howOftenKeepFresh, callBack)
 		return nil
 	}
